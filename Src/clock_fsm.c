@@ -93,6 +93,17 @@ void checkTimeRemind()
     }
 }
 
+void showUpdateErrorAndBackToNormal(){
+    lcd_ShowStr(70, 180, "UPDATE FALSE", GRED, BLACK, 32, 1);
+    HAL_Delay(1000); // show error string, delay 1s then back to normal mode
+    clockState = NORMAL;
+    lcd_Clear(BLACK);
+    updateDisplayTime(ds3231_date, ds3231_month, ds3231_year, ds3231_day, ds3231_hours,
+                    ds3231_min, ds3231_sec);
+    displayNormalTime(displayDate, displayMonth, displayYear, displayDay, displayHour,
+                    displayMinute, displaySecond);
+}
+
 void clock_fsm()
 {
     switch (clockState)
@@ -560,6 +571,7 @@ void clock_fsm()
 							{
 								uart_sent_conut = 0;
 								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+                                showUpdateErrorAndBackToNormal();
 							}
 						}
 					}
@@ -613,6 +625,7 @@ void clock_fsm()
 							{
 								uart_sent_conut = 0;
 								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+                                showUpdateErrorAndBackToNormal();
 							}
 						}
 					}
@@ -664,6 +677,7 @@ void clock_fsm()
 							{
 								uart_sent_conut = 0;
 								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+                                showUpdateErrorAndBackToNormal();
 							}
 						}
 					}
@@ -713,6 +727,7 @@ void clock_fsm()
 							{
 								uart_sent_conut = 0;
 								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+                                showUpdateErrorAndBackToNormal();
 							}
 						}
 					}
@@ -764,6 +779,7 @@ void clock_fsm()
 							{
 								uart_sent_conut = 0;
 								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+                                showUpdateErrorAndBackToNormal();
 							}
 						}
 					}
@@ -817,6 +833,7 @@ void clock_fsm()
 							{
 								uart_sent_conut = 0;
 								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+                                showUpdateErrorAndBackToNormal();
 							}
 						}
 					}
@@ -871,6 +888,7 @@ void clock_fsm()
 							{
 								uart_sent_conut = 0;
 								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+                                showUpdateErrorAndBackToNormal();
 							}
 						}
 					}
