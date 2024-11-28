@@ -112,7 +112,7 @@ int main(void)
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
     lcd_Clear(BLACK);
-    updateTime(18, 11, 24, 2, 10, 0, 0);
+    // updateTime(18, 11, 24, 2, 10, 0, 0);
     //  test_Uart();
     while (1)
     {
@@ -122,8 +122,16 @@ int main(void)
             button_Scan();
             test_LedDebug();
             ds3231_ReadTime();
+            if (resultDone == 1)
+            {
+                resultDone = 0;
+                led7_SetDigit(uart_result % 10, 3, 0);
+                led7_SetDigit((uart_result/10) % 10, 2, 0);
+                led7_SetDigit((uart_result/100) % 10, 1, 0);
+                led7_SetDigit(0, 0, 0);
+            }
         }
-        clock_fsm();
+        // clock_fsm();
         // test_Uart();
         /* USER CODE END WHILE */
 
@@ -184,6 +192,7 @@ void system_init()
     HAL_GPIO_WritePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin, 0);
     timer_init();
     led7_init();
+    led7_SetColon (0); //turn off the colon
     button_init();
     lcd_init();
     uart_init_rs232();

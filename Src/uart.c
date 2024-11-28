@@ -7,9 +7,17 @@
 #include "uart.h"
 #include "lcd.h"
 #include "clock_fsm.h"
+typedef enum {
+    NO,
+    ADD, SUB, MUL
+} OPERATOR;
 
 UART_state uartState = NOTHING;
-
+OPERATOR Operator = NOTHING;
+int8_t uart_num1=0;
+int8_t uart_num2=0;
+int8_t uart_result=0; 
+int8_t resultDone=0;
 uint8_t receive_buffer1 = 0;
 uint8_t hour, min, second;
 uint8_t msg[100];
@@ -64,20 +72,87 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	if(huart->Instance == USART1){
 		// rs232 isr
 		// can be modified
-		HAL_UART_Transmit(&huart1, &receive_buffer1, 1, 10);
+		// HAL_UART_Transmit(&huart1, &receive_buffer1, 1, 10);
         switch (uartState)
         {
+        case NOTHING:
+            if ((0 <= receive_buffer1 - '0') && (receive_buffer1 - '0' <=9))
+            {
+                uart_num1 = receive_buffer1 - '0';
+                uartState = NUM1;
+            }
+            else
+            {
+                uart_num1 = 0;
+                uart_num2 = 0;
+                Operator = NO;
+                uartState = NOTHING;
+            }
+            break;
         case NUM1:
-            uartUpdateValue = receive_buffer1 - '0';
-            uartState =NUM2;
+            /*if ((0 <= receive_buffer1 - '0') && (receive_buffer1 - '0' <=9))
+            {
+                NUM1 = NUM1*10 + receive_buffer1 - '0';
+                uartState = NUM1;
+            }
+            else */if (receive_buffer1 == '+')
+            {
+                Operator = ADD;
+                uartState = NUM2;
+            }
+            else if (receive_buffer1 == '-')
+            {
+                Operator = SUB;
+                uartState = NUM2;
+            }
+            else if (receive_buffer1 == '*')
+            {
+                Operator = MUL;
+                uartState = NUM2;
+            }
+            else
+            {
+                uart_num1 = 0;
+                uart_num2 = 0;
+                Operator = NO;
+                uartState = NOTHING;
+            }
             break;
         case NUM2:
-            uartUpdateValue = uartUpdateValue*10 + ( receive_buffer1 - '0');
+            if ((0 <= receive_buffer1 - '0') && (receive_buffer1 - '0' <=9))
+            {
+                uart_num2 = receive_buffer1 - '0';
+                switch (Operator)
+                {
+                case ADD:
+                    uart_result = uart_num1 + uart_num2;
+                    resultDone = 1;
+                    break;
+                case SUB:
+                    uart_result = uart_num1 - uart_num2;
+                    resultDone = 1;
+                    break;
+                case MUL:
+                    uart_result = uart_num1 * uart_num2;
+                    resultDone = 1;
+                    break;
+                default:
+                    break;
+                }
+                Operator = NO;
+            }
+            else
+            {
+                uart_num1 = 0;
+                uart_num2 = 0;
+                Operator = NO;
+                // uartState = NOTHING
+            }
             uartState = NOTHING;
-            isUartUpdate = 1;
             break;
 
         default:
+            uartState = NOTHING;
             break;
         }
 

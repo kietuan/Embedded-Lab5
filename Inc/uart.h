@@ -12,10 +12,12 @@
 #include "utils.h"
 typedef enum {
     NOTHING,
-    NUM1, NUM2
+    NUM1, NUM2, RESULT
 } UART_state;
 
 extern UART_state uartState;
+extern int8_t uart_result;
+extern int8_t resultDone;
 
 void uart_init_rs232();
 
