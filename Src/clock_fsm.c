@@ -37,6 +37,8 @@ int remindHour = 0;
 int remindMinute = 0;
 int remindSecond = 0;
 
+static int uart_sent_conut = 0;
+
 void updateTime(uint8_t date, uint8_t month, uint8_t year, uint8_t day, uint8_t hour,
                 uint8_t minute, uint8_t second)
 {
@@ -534,16 +536,47 @@ void clock_fsm()
                         uart_Rs232SendString("t");
                         uart_Rs232SendString("e");
                         uart_Rs232SendString("\n");
+						uart_sent_conut = 1;
                         uartState = NUM1;
-                        isUartUpdate = 2;
+                        isUartUpdate = 3; //3 is wait
+						setTimer4(10000);
                         // change var isUartUpdate = 1 if updated
                     }
+					else if (isUartUpdate == 3)
+					{
+						if (flag_timer4)
+						{	
+							if (uart_sent_conut <= 2)
+							{	
+								uart_Rs232SendString("D");
+								uart_Rs232SendString("a");
+								uart_Rs232SendString("t");
+								uart_Rs232SendString("e");
+								uart_Rs232SendString("\n");
+								++uart_sent_conut;
+								setTimer4(10000);
+							}
+							else // if (uart_sent_conut >= 3)
+							{
+								uart_sent_conut = 0;
+								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+							}
+						}
+					}
                     else if (isUartUpdate == 1)
-                    {
-                        displayDate = uartUpdateValue;
-                        isUartUpdate = 2;
+                    {	
+						if (uartUpdateValue >= 0 && uartUpdateValue <= 31)
+						{
+							displayDate = uartUpdateValue;
+							isUartUpdate = 2;
+						}
+						else
+						{
+							isUartUpdate = 0;
+						}
                     }
                 }
+				
                 else if (clockModifyState == MONTH)
                 {
                     if (isUartUpdate == 0)
@@ -555,16 +588,48 @@ void clock_fsm()
                         uart_Rs232SendString("t");
                         uart_Rs232SendString("h");
                         uart_Rs232SendString("\n");
+						uart_sent_conut = 1;
                         uartState = NUM1;
-                        isUartUpdate = 2;
+                        isUartUpdate = 3; //3 is wait
+						setTimer4(10000);
                         // change var isUartUpdate = 1 if updated
                     }
+					else if (isUartUpdate == 3)
+					{
+						if (flag_timer4)
+						{	
+							if (uart_sent_conut <= 2)
+							{	
+								uart_Rs232SendString("M");
+								uart_Rs232SendString("o");
+								uart_Rs232SendString("n");
+								uart_Rs232SendString("t");
+								uart_Rs232SendString("h");
+								uart_Rs232SendString("\n");
+								++uart_sent_conut;
+								setTimer4(10000);
+							}
+							else // if (uart_sent_conut >= 3)
+							{
+								uart_sent_conut = 0;
+								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+							}
+						}
+					}
                     else if (isUartUpdate == 1)
                     {
-                        displayMonth = uartUpdateValue;
-                        isUartUpdate = 2;
+                        if (uartUpdateValue >= 0 && uartUpdateValue <= 12)
+						{
+							displayDate = uartUpdateValue;
+							isUartUpdate = 2;
+						}
+						else
+						{
+							isUartUpdate = 0;
+						}
                     }
                 }
+
                 else if (clockModifyState == YEAR)
                 {
                     if (isUartUpdate == 0)
@@ -575,16 +640,47 @@ void clock_fsm()
                         uart_Rs232SendString("a");
                         uart_Rs232SendString("r");
                         uart_Rs232SendString("\n");
+						uart_sent_conut = 1;
                         uartState = NUM1;
-                        isUartUpdate = 2;
+                        isUartUpdate = 3; //3 is wait
+						setTimer4(10000);
                         // change var isUartUpdate = 1 if updated
                     }
+					else if (isUartUpdate == 3)
+					{
+						if (flag_timer4)
+						{	
+							if (uart_sent_conut <= 2)
+							{	
+								uart_Rs232SendString("D");
+								uart_Rs232SendString("a");
+								uart_Rs232SendString("t");
+								uart_Rs232SendString("e");
+								uart_Rs232SendString("\n");
+								++uart_sent_conut;
+								setTimer4(10000);
+							}
+							else // if (uart_sent_conut >= 3)
+							{
+								uart_sent_conut = 0;
+								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+							}
+						}
+					}
                     else if (isUartUpdate == 1)
-                    {
-                        displayYear = uartUpdateValue;
-                        isUartUpdate = 2;
+                    {	
+						if (uartUpdateValue >= 0 && uartUpdateValue <= 31)
+						{
+							displayDate = uartUpdateValue;
+							isUartUpdate = 2;
+						}
+						else
+						{
+							isUartUpdate = 0;
+						}
                     }
                 }
+
                 else if (clockModifyState == DAY)
                 {
                     if (isUartUpdate == 0)
@@ -594,16 +690,46 @@ void clock_fsm()
                         uart_Rs232SendString("a");
                         uart_Rs232SendString("y");
                         uart_Rs232SendString("\n");
+						uart_sent_conut = 1;
                         uartState = NUM1;
-                        isUartUpdate = 2;
+                        isUartUpdate = 3; //3 is wait
+						setTimer4(10000);
                         // change var isUartUpdate = 1 if updated
                     }
+					else if (isUartUpdate == 3)
+					{
+						if (flag_timer4)
+						{	
+							if (uart_sent_conut <= 2)
+							{	
+								uart_Rs232SendString("D");
+								uart_Rs232SendString("a");
+								uart_Rs232SendString("y");
+								uart_Rs232SendString("\n");
+								++uart_sent_conut;
+								setTimer4(10000);
+							}
+							else // if (uart_sent_conut >= 3)
+							{
+								uart_sent_conut = 0;
+								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+							}
+						}
+					}
                     else if (isUartUpdate == 1)
-                    {
-                        displayDay = uartUpdateValue;
-                        isUartUpdate = 2;
+                    {	
+						if (uartUpdateValue >= 0 && uartUpdateValue <= 31)
+						{
+							displayDate = uartUpdateValue;
+							isUartUpdate = 2;
+						}
+						else
+						{
+							isUartUpdate = 0;
+						}
                     }
                 }
+
                 else if (clockModifyState == HOUR)
                 {
                     if (isUartUpdate == 0)
@@ -614,16 +740,47 @@ void clock_fsm()
                         uart_Rs232SendString("u");
                         uart_Rs232SendString("r");
                         uart_Rs232SendString("\n");
+						uart_sent_conut = 1;
                         uartState = NUM1;
-                        isUartUpdate = 2;
+                        isUartUpdate = 3; //3 is wait
+						setTimer4(10000);
                         // change var isUartUpdate = 1 if updated
                     }
+					else if (isUartUpdate == 3)
+					{
+						if (flag_timer4)
+						{	
+							if (uart_sent_conut <= 2)
+							{	
+								uart_Rs232SendString("h");
+								uart_Rs232SendString("o");
+								uart_Rs232SendString("u");
+								uart_Rs232SendString("r");
+								uart_Rs232SendString("\n");
+								++uart_sent_conut;
+								setTimer4(10000);
+							}
+							else // if (uart_sent_conut >= 3)
+							{
+								uart_sent_conut = 0;
+								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+							}
+						}
+					}
                     else if (isUartUpdate == 1)
-                    {
-                        displayHour = uartUpdateValue;
-                        isUartUpdate = 2;
+                    {	
+						if (uartUpdateValue >= 0 && uartUpdateValue <= 31)
+						{
+							displayDate = uartUpdateValue;
+							isUartUpdate = 2;
+						}
+						else
+						{
+							isUartUpdate = 0;
+						}
                     }
                 }
+
                 else if (clockModifyState == MINUTE)
                 {
                     if (isUartUpdate == 0)
@@ -634,14 +791,46 @@ void clock_fsm()
                         uart_Rs232SendString("n");
                         uart_Rs232SendString("u");
                         uart_Rs232SendString("\n");
+						uart_sent_conut = 1;
                         uartState = NUM1;
-                        isUartUpdate = 2;
+                        isUartUpdate = 3; //3 is wait
+						setTimer4(10000);
                         // change var isUartUpdate = 1 if updated
                     }
+					else if (isUartUpdate == 3)
+					{
+						if (flag_timer4)
+						{	
+							if (uart_sent_conut <= 2)
+							{	
+								uart_Rs232SendString("M");
+								uart_Rs232SendString("i");
+								uart_Rs232SendString("n");
+								uart_Rs232SendString("u");
+								uart_Rs232SendString("t");
+								uart_Rs232SendString("e");
+								uart_Rs232SendString("\n");
+								++uart_sent_conut;
+								setTimer4(10000);
+							}
+							else // if (uart_sent_conut >= 3)
+							{
+								uart_sent_conut = 0;
+								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+							}
+						}
+					}
                     else if (isUartUpdate == 1)
-                    {
-                        displayMinute = uartUpdateValue;
-                        isUartUpdate = 2;
+                    {	
+						if (uartUpdateValue >= 0 && uartUpdateValue <= 31)
+						{
+							displayDate = uartUpdateValue;
+							isUartUpdate = 2;
+						}
+						else
+						{
+							isUartUpdate = 0;
+						}
                     }
                 }
                 else if (clockModifyState == SECOND)
@@ -653,15 +842,49 @@ void clock_fsm()
                         uart_Rs232SendString("e");
                         uart_Rs232SendString("c");
                         uart_Rs232SendString("o");
+						uart_Rs232SendString("n");
+						uart_Rs232SendString("d");
                         uart_Rs232SendString("\n");
+						uart_sent_conut = 1;
                         uartState = NUM1;
-                        isUartUpdate = 2;
+                        isUartUpdate = 3; //3 is wait
+						setTimer4(10000);
                         // change var isUartUpdate = 1 if updated
                     }
+					else if (isUartUpdate == 3)
+					{
+						if (flag_timer4)
+						{	
+							if (uart_sent_conut <= 2)
+							{	
+								uart_Rs232SendString("S");
+								uart_Rs232SendString("e");
+								uart_Rs232SendString("c");
+								uart_Rs232SendString("o");
+								uart_Rs232SendString("n");
+								uart_Rs232SendString("d");
+								uart_Rs232SendString("\n");
+								++uart_sent_conut;
+								setTimer4(10000);
+							}
+							else // if (uart_sent_conut >= 3)
+							{
+								uart_sent_conut = 0;
+								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+							}
+						}
+					}
                     else if (isUartUpdate == 1)
-                    {
-                        displaySecond = uartUpdateValue;
-                        isUartUpdate = 2;
+                    {	
+						if (uartUpdateValue >= 0 && uartUpdateValue <= 31)
+						{
+							displayDate = uartUpdateValue;
+							isUartUpdate = 2;
+						}
+						else
+						{
+							isUartUpdate = 0;
+						}
                     }
                 }
                 else

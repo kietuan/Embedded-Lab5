@@ -67,9 +67,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 		HAL_UART_Transmit(&huart1, &receive_buffer1, 1, 10);
         switch (uartState)
         {
-        case NOTHING:
-            ;
-            break;
         case NUM1:
             uartUpdateValue = receive_buffer1 - '0';
             uartState =NUM2;
