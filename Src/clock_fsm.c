@@ -360,9 +360,10 @@ void clock_fsm(){
 		}
 		else{
 			clockState = REQUEST;
-			lcd_ShowStr(70, 40, "REQUEST", GRED, BLACK, 32, 1);
+			// lcd_ShowStr(70, 40, "UpdatingDate", GRED, BLACK, 32, 1);
 
 			if(clockModifyState == DATE){
+				lcd_ShowStr(20, 40, "UpdatingDate", GRED, BLACK, 32, 1);
 				if(isUartUpdate == 0){
 					// send request uart
 					uart_Rs232SendString("D");
@@ -380,6 +381,7 @@ void clock_fsm(){
 				}
 			}
 			else if(clockModifyState == MONTH){
+				lcd_ShowStr(20, 40, "UpdatingMonth", GRED, BLACK, 32, 1);
 				if(isUartUpdate == 0){
 					// send request uart
 					uart_Rs232SendString("M");
@@ -398,6 +400,7 @@ void clock_fsm(){
 				}
 			}
 			else if(clockModifyState == YEAR){
+				lcd_ShowStr(20, 40, "UpdatingYear", GRED, BLACK, 32, 1);
 				if(isUartUpdate == 0){
 					// send request uart
 					uart_Rs232SendString("y");
@@ -415,6 +418,7 @@ void clock_fsm(){
 				}
 			}
 			else if(clockModifyState == DAY){
+				lcd_ShowStr(30, 40, "UpdatingDay", GRED, BLACK, 32, 1);
 				if(isUartUpdate == 0){
 					// send request uart
 					uart_Rs232SendString("d");
@@ -431,6 +435,7 @@ void clock_fsm(){
 				}
 			}
 			else if(clockModifyState == HOUR){
+				lcd_ShowStr(20, 40, "UpdatingHour", GRED, BLACK, 32, 1);
 				if(isUartUpdate == 0){
 					// send request uart
 					uart_Rs232SendString("h");
@@ -448,12 +453,15 @@ void clock_fsm(){
 				}
 			}
 			else if(clockModifyState == MINUTE){
+				lcd_ShowStr(20, 40, "UpdatingMin", GRED, BLACK, 32, 1);
 				if(isUartUpdate == 0){
 					// send request uart
 					uart_Rs232SendString("M");
 					uart_Rs232SendString("i");
 					uart_Rs232SendString("n");
 					uart_Rs232SendString("u");
+					uart_Rs232SendString("t");
+					uart_Rs232SendString("e");
 					uart_Rs232SendString("\n");
 					uartState = NUM1;
 					isUartUpdate = 2;
@@ -465,12 +473,15 @@ void clock_fsm(){
 				}
 			}
 			else if(clockModifyState == SECOND){
+				lcd_ShowStr(0, 40, "UpdatingSencond", GRED, BLACK, 32, 1);
 				if(isUartUpdate == 0){
 					// send request uart
 					uart_Rs232SendString("S");
 					uart_Rs232SendString("e");
 					uart_Rs232SendString("c");
 					uart_Rs232SendString("o");
+					uart_Rs232SendString("n");
+					uart_Rs232SendString("d");
 					uart_Rs232SendString("\n");
 					uartState = NUM1;
 					isUartUpdate = 2;
