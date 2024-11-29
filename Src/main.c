@@ -122,8 +122,9 @@ int main(void)
             button_Scan();
             test_LedDebug();
             ds3231_ReadTime();
+            clock_fsm();
+
         }
-        clock_fsm();
         // test_Uart();
         /* USER CODE END WHILE */
 

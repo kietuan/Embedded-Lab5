@@ -24,6 +24,10 @@ uint16_t flag_timer4 = 0;
 uint16_t timer4_counter = 0;
 uint16_t timer4_MUL = 0;
 
+uint16_t flag_timer5 = 0;
+uint16_t timer5_counter = 0;
+uint16_t timer5_MUL = 0;
+
 
 /**
   * @brief  Init timer interrupt
@@ -57,6 +61,12 @@ void setTimer4(uint16_t duration){
 	timer4_counter = timer4_MUL;
 	flag_timer4 = 0;
 }
+
+void setTimer5(uint16_t duration){
+	timer5_MUL = duration/TIMER_CYCLE_4;
+	timer5_counter = timer5_MUL;
+	flag_timer5 = 0;
+}
 /**
   * @brief  Timer interrupt routine
   * @param  htim TIM Base handle
@@ -83,7 +93,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 			timer4_counter--;
 			if(timer4_counter == 0) {
 				flag_timer4 = 1;
-				timer4_counter = timer4_MUL;
+				// timer4_counter = timer4_MUL;
+			}
+		}
+		if(timer5_counter > 0){
+			timer5_counter--;
+			if(timer5_counter == 0) {
+				flag_timer5 = 1;
+				timer5_counter = timer5_MUL;
 			}
 		}
 		// 1ms interrupt here

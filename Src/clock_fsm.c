@@ -535,10 +535,11 @@ void clock_fsm()
             else
             {
                 clockState = REQUEST;
-                lcd_ShowStr(70, 40, "REQUEST", GRED, BLACK, 32, 1);
+                // lcd_ShowStr(70, 40, "REQUEST", GRED, BLACK, 32, 1);
 
                 if (clockModifyState == DATE)
                 {
+                lcd_ShowStr(20, 40, "UpdatingDate", GRED, BLACK, 32, 1);
                     if (isUartUpdate == 0)
                     {
                         // send request uart
@@ -553,6 +554,7 @@ void clock_fsm()
 						setTimer4(10000);
                         // change var isUartUpdate = 1 if updated
                     }
+
 					else if (isUartUpdate == 3)
 					{
 						if (flag_timer4)
@@ -571,13 +573,14 @@ void clock_fsm()
 							{
 								uart_sent_conut = 0;
 								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+                                uartState = NOTHING;
                                 showUpdateErrorAndBackToNormal();
 							}
 						}
 					}
                     else if (isUartUpdate == 1)
                     {	
-						if (uartUpdateValue >= 0 && uartUpdateValue <= 31)
+						if (uartUpdateValue >= 1 && uartUpdateValue <= 31)
 						{
 							displayDate = uartUpdateValue;
 							isUartUpdate = 2;
@@ -591,6 +594,7 @@ void clock_fsm()
 				
                 else if (clockModifyState == MONTH)
                 {
+                    lcd_ShowStr(20, 40, "UpdatingMonth", GRED, BLACK, 32, 1);
                     if (isUartUpdate == 0)
                     {
                         // send request uart
@@ -625,15 +629,16 @@ void clock_fsm()
 							{
 								uart_sent_conut = 0;
 								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+                                uartState = NOTHING;
                                 showUpdateErrorAndBackToNormal();
 							}
 						}
 					}
                     else if (isUartUpdate == 1)
                     {
-                        if (uartUpdateValue >= 0 && uartUpdateValue <= 12)
+                        if (uartUpdateValue >= 1 && uartUpdateValue <= 12)
 						{
-							displayDate = uartUpdateValue;
+							displayMonth = uartUpdateValue;
 							isUartUpdate = 2;
 						}
 						else
@@ -645,6 +650,7 @@ void clock_fsm()
 
                 else if (clockModifyState == YEAR)
                 {
+                    lcd_ShowStr(20, 40, "UpdatingYear", GRED, BLACK, 32, 1);
                     if (isUartUpdate == 0)
                     {
                         // send request uart
@@ -677,15 +683,16 @@ void clock_fsm()
 							{
 								uart_sent_conut = 0;
 								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+                                uartState = NOTHING;
                                 showUpdateErrorAndBackToNormal();
 							}
 						}
 					}
                     else if (isUartUpdate == 1)
                     {	
-						if (uartUpdateValue >= 0 && uartUpdateValue <= 31)
+						if (uartUpdateValue >= 1 && uartUpdateValue <= 99)
 						{
-							displayDate = uartUpdateValue;
+							displayYear = uartUpdateValue;
 							isUartUpdate = 2;
 						}
 						else
@@ -697,6 +704,7 @@ void clock_fsm()
 
                 else if (clockModifyState == DAY)
                 {
+                    lcd_ShowStr(30, 40, "UpdatingDay", GRED, BLACK, 32, 1);
                     if (isUartUpdate == 0)
                     {
                         // send request uart
@@ -727,15 +735,16 @@ void clock_fsm()
 							{
 								uart_sent_conut = 0;
 								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+                                uartState = NOTHING;
                                 showUpdateErrorAndBackToNormal();
 							}
 						}
 					}
                     else if (isUartUpdate == 1)
                     {	
-						if (uartUpdateValue >= 0 && uartUpdateValue <= 31)
+						if (uartUpdateValue >= 1 && uartUpdateValue <= 31)
 						{
-							displayDate = uartUpdateValue;
+							displayDay = uartUpdateValue;
 							isUartUpdate = 2;
 						}
 						else
@@ -747,6 +756,7 @@ void clock_fsm()
 
                 else if (clockModifyState == HOUR)
                 {
+                    lcd_ShowStr(20, 40, "UpdatingHour", GRED, BLACK, 32, 1);
                     if (isUartUpdate == 0)
                     {
                         // send request uart
@@ -779,15 +789,16 @@ void clock_fsm()
 							{
 								uart_sent_conut = 0;
 								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+                                uartState = NOTHING;
                                 showUpdateErrorAndBackToNormal();
 							}
 						}
 					}
                     else if (isUartUpdate == 1)
                     {	
-						if (uartUpdateValue >= 0 && uartUpdateValue <= 31)
+						if (uartUpdateValue >= 1 && uartUpdateValue <= 24)
 						{
-							displayDate = uartUpdateValue;
+							displayHour = uartUpdateValue;
 							isUartUpdate = 2;
 						}
 						else
@@ -799,6 +810,7 @@ void clock_fsm()
 
                 else if (clockModifyState == MINUTE)
                 {
+                    lcd_ShowStr(20, 40, "UpdatingMin", GRED, BLACK, 32, 1);
                     if (isUartUpdate == 0)
                     {
                         // send request uart
@@ -806,6 +818,8 @@ void clock_fsm()
                         uart_Rs232SendString("i");
                         uart_Rs232SendString("n");
                         uart_Rs232SendString("u");
+                        uart_Rs232SendString("t");
+                        uart_Rs232SendString("e");
                         uart_Rs232SendString("\n");
 						uart_sent_conut = 1;
                         uartState = NUM1;
@@ -833,15 +847,16 @@ void clock_fsm()
 							{
 								uart_sent_conut = 0;
 								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+                                uartState = NOTHING;
                                 showUpdateErrorAndBackToNormal();
 							}
 						}
 					}
                     else if (isUartUpdate == 1)
                     {	
-						if (uartUpdateValue >= 0 && uartUpdateValue <= 31)
+						if (uartUpdateValue >= 1 && uartUpdateValue <= 59)
 						{
-							displayDate = uartUpdateValue;
+							displayMinute = uartUpdateValue;
 							isUartUpdate = 2;
 						}
 						else
@@ -852,6 +867,7 @@ void clock_fsm()
                 }
                 else if (clockModifyState == SECOND)
                 {
+                    lcd_ShowStr(0, 40, "UpdatingSencond", GRED, BLACK, 32, 1);
                     if (isUartUpdate == 0)
                     {
                         // send request uart
@@ -888,15 +904,16 @@ void clock_fsm()
 							{
 								uart_sent_conut = 0;
 								//TODO: báo lỗi thông qua LCD và quay về chế độ hoạt động bình thường.
+                                uartState = NOTHING;
                                 showUpdateErrorAndBackToNormal();
 							}
 						}
 					}
                     else if (isUartUpdate == 1)
                     {	
-						if (uartUpdateValue >= 0 && uartUpdateValue <= 31)
+						if (uartUpdateValue >= 1 && uartUpdateValue <= 59)
 						{
-							displayDate = uartUpdateValue;
+							displaySecond = uartUpdateValue;
 							isUartUpdate = 2;
 						}
 						else
