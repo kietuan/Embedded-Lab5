@@ -10,6 +10,9 @@
 #include "usart.h"
 #include <stdio.h>
 #include "utils.h"
+#include <stdlib.h>
+#include <stdint.h>
+
 typedef enum {
     NOTHING,
     NUM1, NUM2, RESULT
@@ -18,6 +21,10 @@ typedef enum {
 extern UART_state uartState;
 extern int8_t uart_result;
 extern int8_t resultDone;
+
+extern uint8_t write_index, read_index;
+
+void process_uart_buffer(void);
 
 void uart_init_rs232();
 

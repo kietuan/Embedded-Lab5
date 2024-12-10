@@ -7,6 +7,7 @@
 #include "uart.h"
 #include "lcd.h"
 #include "clock_fsm.h"
+#define BUFFER_SIZE 255
 typedef enum {
     NO,
     ADD, SUB, MUL
@@ -18,12 +19,14 @@ int8_t uart_num1=0;
 int8_t uart_num2=0;
 int8_t uart_result=0; 
 int8_t resultDone=0;
-uint8_t receive_buffer1 = 0;
+uint8_t receive_buffer1[255];
 uint8_t hour, min, second;
 uint8_t msg[100];
+uint8_t write_index=0;
+uint8_t read_index=0;
 
 void uart_init_rs232(){
-	HAL_UART_Receive_IT(&huart1, &receive_buffer1, 1);
+	HAL_UART_Receive_IT(&huart1, receive_buffer1, 1);
 }
 
 void uart_Rs232SendString(uint8_t* str){
@@ -73,95 +76,68 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 		// rs232 isr
 		// can be modified
 		// HAL_UART_Transmit(&huart1, &receive_buffer1, 1, 10);
-        switch (uartState)
+        if (write_index != read_index-1)
         {
-        case NOTHING:
-            if ((0 <= receive_buffer1 - '0') && (receive_buffer1 - '0' <=9))
-            {
-                uart_num1 = receive_buffer1 - '0';
-                uartState = NUM1;
-            }
-            else
-            {
-                uart_num1 = 0;
-                uart_num2 = 0;
-                Operator = NO;
-                uartState = NOTHING;
-            }
-            break;
-        case NUM1:
-            /*if ((0 <= receive_buffer1 - '0') && (receive_buffer1 - '0' <=9))
-            {
-                NUM1 = NUM1*10 + receive_buffer1 - '0';
-                uartState = NUM1;
-            }
-            else */if (receive_buffer1 == '+')
-            {
-                Operator = ADD;
-                uartState = NUM2;
-            }
-            else if (receive_buffer1 == '-')
-            {
-                Operator = SUB;
-                uartState = NUM2;
-            }
-            else if (receive_buffer1 == '*')
-            {
-                Operator = MUL;
-                uartState = NUM2;
-            }
-            else
-            {
-                uart_num1 = 0;
-                uart_num2 = 0;
-                Operator = NO;
-                uartState = NOTHING;
-            }
-            break;
-        case NUM2:
-            if ((0 <= receive_buffer1 - '0') && (receive_buffer1 - '0' <=9))
-            {
-                uart_num2 = receive_buffer1 - '0';
-                switch (Operator)
-                {
-                case ADD:
-                    uart_result = uart_num1 + uart_num2;
-                    resultDone = 1;
-                    break;
-                case SUB:
-                    uart_result = uart_num1 - uart_num2;
-                    resultDone = 1;
-                    break;
-                case MUL:
-                    uart_result = uart_num1 * uart_num2;
-                    resultDone = 1;
-                    break;
-                default:
-                    break;
-                }
-                Operator = NO;
-            }
-            else
-            {
-                uart_num1 = 0;
-                uart_num2 = 0;
-                Operator = NO;
-                // uartState = NOTHING
-            }
-            uartState = NOTHING;
-            break;
-
-        default:
-            uartState = NOTHING;
-            break;
+		    HAL_UART_Receive_IT(&huart1, receive_buffer1 + write_index, 1);
+            ++write_index;
         }
-
-		// turn on the receice interrupt
-		HAL_UART_Receive_IT(&huart1, &receive_buffer1, 1);
-//		lcd_StrCenter(0, 2, &receive_buffer1, RED, BLUE, 16,
-//				 1);
-
 	}
 }
 
+
+void process_uart_buffer(void) {
+    if (receive_buffer1[write_index] == '#' && read_index != write_index) 
+    {
+        char temp_buffer[BUFFER_SIZE];
+        int temp_index = 0;
+
+        // Read characters from the buffer until '#'
+        while (read_index != write_index) {
+            temp_buffer[temp_index++] = receive_buffer1[read_index];
+            read_index = (read_index + 1) % BUFFER_SIZE;
+            if (receive_buffer1[read_index] == '#') {
+                break;
+            }
+        }
+        temp_buffer[temp_index] = '\0'; // Null-terminate the string
+
+        // Parse and calculate the expression
+        int num1, num2;
+        char operator;
+        sscanf(temp_buffer, "%d%c%d", &num1, &operator, &num2);
+
+        switch (operator) {
+            case '+':
+                uart_result = num1 + num2;
+                resultDone = 1;
+                break;
+            case '-':
+                uart_result = num1 - num2;
+                resultDone = 1;
+                break;
+            case '*':
+                uart_result = num1 * num2;
+                resultDone = 1;
+                break;
+            case '/':
+                if (num2 != 0) {
+                    uart_result = num1 / num2;
+                    resultDone = 1;
+                } else {
+                    // Handle division by zero if needed
+                    resultDone = 0;
+                    uart_result = 0;
+                }
+                break;
+            default:
+                // Handle unknown operator if needed
+                uart_result = 0;
+                resultDone = 0;
+                break;
+        }
+
+        // Reset read_index to the next position after '#'
+        read_index = (read_index + 1) % BUFFER_SIZE;
+    }
+}
 

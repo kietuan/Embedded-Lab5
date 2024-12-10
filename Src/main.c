@@ -122,6 +122,7 @@ int main(void)
             button_Scan();
             test_LedDebug();
             ds3231_ReadTime();
+            process_uart_buffer();
             if (resultDone == 1)
             {
                 resultDone = 0;
